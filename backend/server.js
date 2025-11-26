@@ -34,10 +34,11 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.use('*', (req, res) => {
+app.use( (req, res) => {
   res.status(404).json({
     success: false,
-    message: 'API route not found'
+    message: 'API route not found',
+    requestedPath: req.originalUrl 
   });
 });
 
@@ -70,6 +71,7 @@ const startServer = async () => {
   app.listen(PORT, () => {
     console.log(`🎯 Server is running on port ${PORT}`);
     console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`📊 MongoDB URI: ${process.env.MONGODB_URI}`); 
   });
 };
 
