@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 
-
+// CORS Configuration
 app.use(cors({
   origin: [
     'http://localhost:5173',
@@ -19,7 +19,7 @@ app.use(cors({
   credentials: true
 }));
 
-
+// Body parser middleware
 app.use(express.json());
 
 // Request logging middleware
@@ -28,29 +28,54 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
-app.use('/api/profiles', profileRoutes);
-app.use('/api/events', eventRoutes);
+// Root endpoint - API welcome page
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: '🚀 Event Management API is running!',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    documentation: 'Visit /api/health for service status',
+    endpoints: {
+      health: '/api/health',
+      profiles: '/api/profiles',
+      events: '/api/events'
+    },
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 
 // Health check route
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Event Management API is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
-// 404 handler
+// API Routes
+app.use('/api/profiles', profileRoutes);
+app.use('/api/events', eventRoutes);
+
+// 404 handler - Catch all undefined routes
 app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: 'API route not found',
-    requestedPath: req.originalUrl 
+    requestedPath: req.originalUrl,
+    availableEndpoints: [
+      'GET /',
+      'GET /api/health',
+      'GET/POST/PUT/DELETE /api/profiles',
+      'GET/POST/PUT/DELETE /api/events'
+    ]
   });
 });
 
-// Error handling middleware
+// Global error handler
 app.use((error, req, res, next) => {
   console.error('Error:', error);
   res.status(500).json({
@@ -60,7 +85,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-
+// Connection state tracking for serverless environments
 let isConnected = false;
 
 const connectDB = async () => {
@@ -70,7 +95,6 @@ const connectDB = async () => {
   }
   
   try {
-   
     await mongoose.connect(process.env.MONGODB_URI, {
       // Optimized for serverless
       maxPoolSize: 10,
@@ -95,7 +119,6 @@ const connectDB = async () => {
     
   } catch (error) {
     console.error('❌ MongoDB connection error:', error);
-    // Don't exit process in serverless - just throw error
     throw error;
   }
 };
@@ -103,6 +126,6 @@ const connectDB = async () => {
 // Connect to database on cold start
 connectDB().catch(console.error);
 
-// VERCEL SERVERLESS EXPORT
+
 // Export the app for Vercel serverless functions
 export default app;
