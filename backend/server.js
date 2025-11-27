@@ -14,7 +14,8 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://your-frontend-app.vercel.app' // Update with your actual frontend URL
+    'https://event-management-system-wy4i-eun4dutt8.vercel.app', 
+    'https://event-management-system-wy4i.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
