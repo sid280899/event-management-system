@@ -5,17 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "test": "echo 'No build step needed for Node.js'"
   },
-  "keywords": [
-    "events",
-    "management",
-    "timezone"
-  ],
   "author": "Siddhesh Neharkar",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "dayjs": "^1.11.19",
