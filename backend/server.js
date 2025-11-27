@@ -16,7 +16,9 @@ app.use(cors({
     'http://localhost:5173',
     'https://your-frontend-app.vercel.app' // Update with your actual frontend URL
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Body parser middleware
