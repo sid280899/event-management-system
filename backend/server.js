@@ -6,16 +6,23 @@ import dotenv from 'dotenv';
 import profileRoutes from './routes/profiles.js';
 import eventRoutes from './routes/events.js';
 
-
 dotenv.config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://your-frontend-app.vercel.app' // Update with your actual frontend URL
+  ],
+  credentials: true
+}));
+
+
 app.use(express.json());
 
-
+// Request logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
@@ -34,7 +41,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.use( (req, res) => {
+// 404 handler
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: 'API route not found',
@@ -48,39 +56,53 @@ app.use((error, req, res, next) => {
   res.status(500).json({
     success: false,
     message: 'Something went wrong on the server',
-    error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : error.message
   });
 });
 
-// db connection
+
+let isConnected = false;
+
 const connectDB = async () => {
+  if (isConnected) {
+    console.log('✅ Using existing database connection');
+    return;
+  }
+  
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+   
+    await mongoose.connect(process.env.MONGODB_URI, {
+      // Optimized for serverless
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      bufferCommands: false
+    });
+    
+    isConnected = true;
     console.log('✅ Connected to MongoDB successfully');
+    
+    // Handle connection events
+    mongoose.connection.on('error', (err) => {
+      console.error('MongoDB connection error:', err);
+      isConnected = false;
+    });
+    
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB disconnected');
+      isConnected = false;
+    });
+    
   } catch (error) {
     console.error('❌ MongoDB connection error:', error);
-    process.exit(1);
+    // Don't exit process in serverless - just throw error
+    throw error;
   }
 };
 
-// start server
-const startServer = async () => {
-  await connectDB();
-  
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`🎯 Server is running on port ${PORT}`);
-    console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
-    console.log(`📊 MongoDB URI: ${process.env.MONGODB_URI}`); 
-  });
-};
+// Connect to database on cold start
+connectDB().catch(console.error);
 
-// handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.log('UNHANDLED REJECTION! 💥 Shutting down...');
-  console.log(err.name, err.message);
-  process.exit(1);
-});
-
-// Start the application
-startServer();
+// VERCEL SERVERLESS EXPORT
+// Export the app for Vercel serverless functions
+export default app;
