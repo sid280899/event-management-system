@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL + '/api';
+const API_BASE = 'https://event-management-system-seven-phi.vercel.app/api';
 
 console.log('Final API_BASE:', API_BASE);
 // Create axios instance with default config
