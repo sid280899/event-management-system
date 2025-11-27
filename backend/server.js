@@ -13,9 +13,10 @@ const app = express();
 // CORS Configuration
 app.use(cors({
   origin: [
-    'http://localhost:5173',
-    'https://event-management-system-wy4i-eun4dutt8.vercel.app', 
-    'https://event-management-system-wy4i.vercel.app'
+    'http://localhost:5173',           // Local development
+    'http://127.0.0.1:5173',           // Local development
+    'https://event-management-system-wy4i-mwkazodtc.vercel.app', // Production frontend
+    'https://event-management-system-wy4i.vercel.app' 
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
