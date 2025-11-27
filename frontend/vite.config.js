@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://event-management-system-68bbpnmsw.vercel.app',
+        target: 'https://event-management-system-nmsj7k6v5.vercel.app',
         changeOrigin: true,
         secure: false
       }
