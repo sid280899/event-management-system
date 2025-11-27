@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
-const API_BASE = 'https://event-manageme-git-d068e5-siddheshneharkar70-gmailcoms-projects.vercel.app/api';
+const API_BASE = 'https://event-manageme-git-d068e5-siddheshneharkar70-gmailcoms-projects.vercel.app';
 
 console.log('Final API_BASE:', API_BASE);
 // Create axios instance with default config
