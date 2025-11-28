@@ -12,8 +12,6 @@ const app = express();
 
 app.use(cors({
   origin: [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
     'https://event-management-system-wy4i.vercel.app',
     'https://event-manageme-git-af4ebe-siddheshneharkar70-gmailcoms-projects.vercel.app',
     'https://*.vercel.app'
